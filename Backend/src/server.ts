@@ -1,5 +1,5 @@
 import express from 'express';
-import { initDB } from './config/db.config';
+import { initDB } from './db/index';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

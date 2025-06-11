@@ -1,39 +1,35 @@
-import { Sequelize } from "sequelize-typescript";
-import { config, dialect } from "./config";
-import Tutorial from "../models/user.model";
+import { Sequelize } from 'sequelize-typescript';
+import User from '../models/user.model';
+import { config, dialect } from '../db/config';
 
-class Database {
-  public sequelize: Sequelize | undefined;
-
-  constructor() {
-    this.connectToDatabase();
+const sequelize = new Sequelize({
+  host: config.HOST,
+  database: config.DB,
+  dialect: dialect,
+  username: config.USER,
+  password: config.PASSWORD,
+  models: [User],
+  logging: false,
+  pool: {
+    max: config.pool.max,
+    min: config.pool.min,
+    acquire: config.pool.acquire,
+    idle: config.pool.idle
   }
+});
 
-  private async connectToDatabase() {
-    this.sequelize = new Sequelize({
-      database: config.DB,
-      username: config.USER,
-      password: config.PASSWORD,
-      host: config.HOST,
-      dialect: dialect,
-      pool: {
-        max: config.pool.max,
-        min: config.pool.min,
-        acquire: config.pool.acquire,
-        idle: config.pool.idle
-      },
-      models: [Tutorial]
-    });
-
-    await this.sequelize
-      .authenticate()
-      .then(() => {
-        console.log("Connection has been established successfully.");
-      })
-      .catch((err) => {
-        console.error("Unable to connect to the Database:", err);
-      });
+export const initDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to database has been established successfully.');
+    
+    // Sync all models with database
+    await sequelize.sync({ alter: true });
+    console.log('Database synchronized successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+    throw error;
   }
-}
+};
 
-export default Database;
+export default sequelize; 
