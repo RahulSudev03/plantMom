@@ -1,4 +1,5 @@
-import { Model, Table, Column, DataType } from "sequelize-typescript";
+import { Model, Table, Column, DataType, HasMany } from "sequelize-typescript";
+import Plant from './plant.model';
 
 @Table({
   tableName: "users",
@@ -56,6 +57,9 @@ export default class User extends Model {
     field: "isActive"
   })
   isActive?: boolean;
+
+  @HasMany(() => Plant)
+plants!: Plant[];
 
   @Column({
     type: DataType.DATE,
