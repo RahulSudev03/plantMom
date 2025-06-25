@@ -7,6 +7,9 @@ const userController = new UserController();
 // Create a new user
 router.post('/', userController.createUser as RequestHandler);
 
+// Login route
+router.post('/login', userController.login as RequestHandler);
+
 // Get a user by ID
 router.get('/:id', userController.getUser as RequestHandler);
 

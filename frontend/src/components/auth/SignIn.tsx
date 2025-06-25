@@ -4,17 +4,40 @@ import { useNavigate } from 'react-router-dom';
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement sign in logic
+    setError('');
+    setLoading(true);
+
     try {
-      // Add your authentication logic here
-      // After successful sign in:
-      navigate('/dashboard');
+      const response = await fetch('http://localhost:3000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token and user data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Navigate to welcome page
+        navigate('/welcome');
+      } else {
+        setError(data.message || 'Login failed');
+      }
     } catch (error) {
-      console.error('Sign in failed:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -22,6 +45,7 @@ const SignIn: React.FC = () => {
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
         <h2>Sign In</h2>
+        {error && <div className="error-message">{error}</div>}
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -30,6 +54,7 @@ const SignIn: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
         <div className="form-group">
@@ -40,10 +65,11 @@ const SignIn: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
-        <button type="submit" className="btn btn-primary">
-          Sign In
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
     </div>

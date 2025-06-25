@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import User from '../models/user.model';
+import Plant from '../models/plant.model';
 import { config, dialect } from '../db/config';
 
 const sequelize = new Sequelize({
@@ -8,7 +9,7 @@ const sequelize = new Sequelize({
   dialect: dialect,
   username: config.USER,
   password: config.PASSWORD,
-  models: [User],
+  models: [User,Plant],
   logging: false,
   pool: {
     max: config.pool.max,
